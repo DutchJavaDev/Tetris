@@ -1,0 +1,5 @@
+TODO 
+	Create manager for generating shapes
+		-render items inside a 2d array / updating---
+
+
