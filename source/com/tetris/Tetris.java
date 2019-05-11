@@ -149,6 +149,8 @@ public class Tetris extends GameApplication
 			if(shapeRotation >= rotationLeght)
 				shapeRotation = 0;
 			
+			//BUG with shape 0 rotation 1: top does net get cleared when redrawing -.- 
+			
 			shapeMatrix = TetrisHelper.GetShapeWithRotation(shapeIndex, shapeRotation);
 			
 			SetShape();
