@@ -3,15 +3,18 @@
  */
 package com.tetris;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * @author Boris Mulder
  *
  */
 public class TetrisHelper
 {
-	public static int SHAPE_MATRIX_WIDTH = 4;
-	public static int SHAPE_MATRIX_HEIGHT = 4;
-	private static byte[][][] SHAPES = new byte[7][4][SHAPE_MATRIX_WIDTH*SHAPE_MATRIX_HEIGHT];
+	public static final int SHAPE_MATRIX_WIDTH = 4;
+	public static final int SHAPE_MATRIX_HEIGHT = 4;
+	private static final byte[][][] SHAPES = new byte[7][4][SHAPE_MATRIX_WIDTH*SHAPE_MATRIX_HEIGHT];
+	
 	
 	public static void Init()
 	{
@@ -137,11 +140,9 @@ public class TetrisHelper
 	
 	public static int GetRandomShapeNumber()
 	{
-		return 0;/*ThreadLocalRandom.current().nextInt(0, SHAPES.length);*/
+		return ThreadLocalRandom.current().nextInt(0, SHAPES.length);
 	}
-	
-	
-	
+
 	/**
 	 * Gets a shape
 	 * @param index
@@ -190,17 +191,18 @@ public class TetrisHelper
 		return lenght;
 	}
 	
+	
 	private static byte[] HorizontalFlip(byte[] shape)
 	{
-		byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_one = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_two = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_three = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_one = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_two = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_three = new byte[SHAPE_MATRIX_WIDTH];
 		
-		byte[] f_index_zero = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] f_index_one = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] f_index_two = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] f_index_three = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] f_index_zero = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] f_index_one = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] f_index_two = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] f_index_three = new byte[SHAPE_MATRIX_WIDTH];
 		
 		System.arraycopy(shape, 0, index_zero, 0, SHAPE_MATRIX_WIDTH);
 		System.arraycopy(shape, 4, index_one, 0, SHAPE_MATRIX_WIDTH);
@@ -215,7 +217,7 @@ public class TetrisHelper
 			f_index_three[i] = index_three[(index_zero.length - 1) - i];
 		}
 		
-		byte[] hf_shape = new byte [shape.length];
+		final byte[] hf_shape = new byte [shape.length];
 		
 		System.arraycopy(f_index_zero, 0, hf_shape, 0, SHAPE_MATRIX_WIDTH);
 		System.arraycopy(f_index_one, 0, hf_shape, 4, SHAPE_MATRIX_WIDTH);
@@ -232,11 +234,11 @@ public class TetrisHelper
 	 */
 	private static boolean[][] CreateShape(byte[] shape)
 	{	
-		boolean[][] shape_matrix = new boolean[SHAPE_MATRIX_WIDTH][SHAPE_MATRIX_HEIGHT];
-		byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_one = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_two = new byte[SHAPE_MATRIX_WIDTH];
-		byte[] index_three = new byte[SHAPE_MATRIX_WIDTH];
+		final boolean[][] shape_matrix = new boolean[SHAPE_MATRIX_WIDTH][SHAPE_MATRIX_HEIGHT];
+		final byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_one = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_two = new byte[SHAPE_MATRIX_WIDTH];
+		final byte[] index_three = new byte[SHAPE_MATRIX_WIDTH];
 		
 		System.arraycopy(shape, 0, index_zero, 0, SHAPE_MATRIX_WIDTH);
 		System.arraycopy(shape, 4, index_one, 0, SHAPE_MATRIX_WIDTH);
