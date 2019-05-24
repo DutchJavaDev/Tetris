@@ -20,25 +20,29 @@ public class Tetris extends GameApplication
 {
 	public static final int GAME_WIDTH = 420;
 	public static final int GAME_HEIGHT = 640;
+	
+	public static final byte EMPTY_SPACE = 0; // empty space
+	public static final byte ACTIVE_SPACE = 1; // shape thats moves
+	public static final byte NONE_ACTIVE_SPACE = 2; // shape that has been placed in game
 
-	private final boolean[][] GAME_MATRIX;
+	private final byte[][] GAME_MATRIX;
 
 	private int shapeIndex;
 	private int shapePosition = 0;
 	private int shapeRotation = 0;
 	private int shapeRotationLeght = 0;
-	private boolean[][] shapeMatrix;
+	private byte[][] shapeMatrix;
 
 	private int shapeX = 4;
 	private int shapeY = 0;
 	private float counter = 0f;
-	private final float updateTime = 80f;
+	private final float updateTime = 25f;
 
 	Tetris()
 	{
 		super("Tetris with a twist");
 		ResizeAble = false;
-		GAME_MATRIX = new boolean[18][12];
+		GAME_MATRIX = new byte[18][12];
 		CreateShape();
 	}
 
@@ -57,24 +61,21 @@ public class Tetris extends GameApplication
 
 	private void Clear()
 	{
-		for (int r = shapeY; r < shapeY + shapeMatrix.length; r++)
+		for (int r = shapeY; r < shapeY + 4; r++)
 		{
-			for (int cell = shapeX; cell < shapeX + shapeMatrix[0].length; cell++)
+			for (int cell = shapeX; cell < shapeX + 4; cell++)
 			{
-				GAME_MATRIX[r][cell] = false;
+				if(GAME_MATRIX[r][cell] == NONE_ACTIVE_SPACE)
+				{
+					// Weird bug with replacing active_space with non_active_space
+					System.out.println("Fking helll");
+				}
 			}
 		}
 	}
 
-	private void CheckBottomBounds()
-	{
-		if (shapeY + 4 > GAME_MATRIX.length)
-			CreateShape();
-	}
-
 	private void SetShape()
 	{
-		CheckBottomBounds();
 		Clear();
 
 		System.arraycopy(shapeMatrix[0], 0, GAME_MATRIX[shapeY], shapeX, TetrisHelper.SHAPE_MATRIX_WIDTH);
@@ -103,14 +104,22 @@ public class Tetris extends GameApplication
 	@Override
 	protected void UpdateGame()
 	{
+		if(IsAtBottom() || HasCollision())
+		{
+			PlaceShape();
+			CreateShape();
+			return;
+		}
+		
 		// Drop the shape after an amount of time
 		if (counter >= updateTime)
 		{
 			// clear matrix if shape is not at the bottom
-			if (!(shapeY + 4 > GAME_MATRIX.length))
+			if (!IsAtBottom())
 				Clear();
-			
+
 			counter = 0;
+			
 			shapeY += 1;
 
 			SetShape();
@@ -118,8 +127,6 @@ public class Tetris extends GameApplication
 		{
 			counter += (Delta * 1);
 		}
-		
-		CheckBottomBounds();
 	}
 
 	@Override
@@ -171,7 +178,7 @@ public class Tetris extends GameApplication
 		}
 
 		// Rotate the shape
-		if (key_code == KeyInput.SPACE && released)
+		if (key_code == KeyInput.SPACE && released && shapeIndex != 3)
 		{
 			shapeRotation++;
 
@@ -196,27 +203,29 @@ public class Tetris extends GameApplication
 	}
 	
 	
-	boolean[][] TryShiftPositionTo(int direction, boolean[][] shape)
+	byte[][] TryShiftPositionTo(int direction, byte[][] shape)
 	{
+		final boolean leftBlock = (shape[0][0] == ACTIVE_SPACE || 
+									  shape[1][0] == ACTIVE_SPACE || 
+									  shape[2][0] == ACTIVE_SPACE || 
+									  shape[3][0] == ACTIVE_SPACE);
+		
+		final boolean rightBlock = (shape[0][shape[0].length-1] == ACTIVE_SPACE||
+									   shape[1][shape[1].length-1] == ACTIVE_SPACE || 
+									   shape[2][shape[2].length-1] == ACTIVE_SPACE || 
+									   shape[3][shape[3].length-1] == ACTIVE_SPACE);
+		
 		// checks if the first cell of each sub array is true
 		// if so then return the current shape
-		if(direction == -1 && 
-				shape[0][0] ||
-				shape[1][0] ||
-				shape[2][0] ||
-				shape[3][0])
+		if(direction == -1 && leftBlock)
 			return shape;
 		
 		// checks if the last cell of each sub array is true
 	    // if so then return the current shape
-		if(direction == 1 && 
-				shape[0][shape[0].length-1] ||
-				shape[1][shape[1].length-1] ||
-				shape[2][shape[2].length-1] ||
-				shape[3][shape[3].length-1])
+		if(direction == 1 && rightBlock)
 			return shape;
 		
-		final boolean[][] n_shape = new boolean[shape.length][shape[0].length];
+		final byte[][] n_shape = new byte[shape.length][shape[0].length];
 		
 		for(int r = 0; r < n_shape.length; r++)
 		{
@@ -225,7 +234,7 @@ public class Tetris extends GameApplication
 				if(direction == 1)
 				{
 					// go right
-					if(shape[r][c] && c+1 <= n_shape[r].length)
+					if(shape[r][c] == ACTIVE_SPACE && c+1 <= n_shape[r].length)
 					{
 						n_shape[r][c+direction] = shape[r][c];
 					}
@@ -233,7 +242,7 @@ public class Tetris extends GameApplication
 				else
 				{
 					// go left
-					if(shape[r][c] && c-1 >= 0)
+					if(shape[r][c] == ACTIVE_SPACE && c-1 >= 0)
 					{
 						n_shape[r][c+direction] = shape[r][c];
 					}
@@ -241,6 +250,41 @@ public class Tetris extends GameApplication
 			}
 		}
 		return n_shape;
+	}
+	
+	boolean IsAtBottom()
+	{
+		return shapeY + 4 == GAME_MATRIX.length;
+	}
+	
+	boolean HasCollision()
+	{
+		int collisionFound = 0;
+		
+		byte[] shape_bottom = GAME_MATRIX[shapeY + 3];
+		byte[] bottom_check = GAME_MATRIX[shapeY + 4];
+		
+		for(int i = shapeX; i < shapeX+4; i++)
+		{
+			if(shape_bottom[i] == ACTIVE_SPACE && bottom_check[i] == NONE_ACTIVE_SPACE)
+				collisionFound++;
+		}
+		
+		return collisionFound > 0;
+	}
+	
+	void PlaceShape()
+	{
+		for(int r = shapeY; r < shapeY + 4; r++)
+		{
+			for(int c = shapeX; c < shapeX + 4; c++)
+			{
+				if(GAME_MATRIX[r][c] == ACTIVE_SPACE)
+				{
+					GAME_MATRIX[r][c] = NONE_ACTIVE_SPACE;
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -254,11 +298,22 @@ public class Tetris extends GameApplication
 		{
 			for (int c = 0; c < GAME_MATRIX[r].length; c++)
 			{
-				if (GAME_MATRIX[r][c])
+				if (GAME_MATRIX[r][c] == ACTIVE_SPACE)
 				{
 					batch.setColor(Color.green);
 					batch.DrawString("*", x, y, "tetris_shape_font");
-				} else
+				}
+				else if(GAME_MATRIX[r][c] == NONE_ACTIVE_SPACE)
+				{
+					batch.setColor(Color.blue);
+					batch.DrawString("*", x, y, "tetris_shape_font");
+				}
+				else if(GAME_MATRIX[r][c] == EMPTY_SPACE)
+				{
+					batch.setColor(Color.pink);
+					batch.DrawString("*", x, y, "tetris_shape_font");
+				}
+				else
 				{
 					batch.setColor(Color.red);
 					batch.DrawString("*", x, y, "tetris_shape_font");
@@ -271,7 +326,7 @@ public class Tetris extends GameApplication
 		}
 		batch.End();
 	}
-
+	
 	public static void main(String[] args)
 	{
 		new GameClient(new Tetris(), GAME_WIDTH, GAME_HEIGHT, GAME_WIDTH, GAME_HEIGHT);

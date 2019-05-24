@@ -148,7 +148,7 @@ public class TetrisHelper
 	 * @param index
 	 * @return
 	 */
-	public static boolean[][] GetShape(int index)
+	public static byte[][] GetShape(int index)
 	{
 		return CreateShape(SHAPES[index][0]);
 	}
@@ -159,7 +159,7 @@ public class TetrisHelper
 	 * @param rotation
 	 * @return
 	 */
-	public static boolean[][] GetShapeWithRotation(int index,int rotation)
+	public static byte[][] GetShapeWithRotation(int index,int rotation)
 	{	
 		return CreateShape(SHAPES[index][rotation]);
 	}
@@ -232,9 +232,9 @@ public class TetrisHelper
 	 * @param shape
 	 * @return
 	 */
-	private static boolean[][] CreateShape(byte[] shape)
+	private static byte[][] CreateShape(byte[] shape)
 	{	
-		final boolean[][] shape_matrix = new boolean[SHAPE_MATRIX_WIDTH][SHAPE_MATRIX_HEIGHT];
+		final byte[][] shape_matrix = new byte[SHAPE_MATRIX_WIDTH][SHAPE_MATRIX_HEIGHT];
 		final byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
 		final byte[] index_one = new byte[SHAPE_MATRIX_WIDTH];
 		final byte[] index_two = new byte[SHAPE_MATRIX_WIDTH];
@@ -247,10 +247,10 @@ public class TetrisHelper
 		
 		for(int r = 0; r < SHAPE_MATRIX_WIDTH; r++)
 		{
-			shape_matrix[0][r] = index_zero[r] == 1;
-			shape_matrix[1][r] = index_one[r] == 1;
-			shape_matrix[2][r] = index_two[r] == 1;
-			shape_matrix[3][r] = index_three[r] == 1;
+			shape_matrix[0][r] = (index_zero[r] == 1 ? Tetris.ACTIVE_SPACE : Tetris.EMPTY_SPACE);
+			shape_matrix[1][r] = (index_one[r] == 1 ? Tetris.ACTIVE_SPACE : Tetris.EMPTY_SPACE);
+			shape_matrix[2][r] = (index_two[r] == 1 ? Tetris.ACTIVE_SPACE : Tetris.EMPTY_SPACE);
+			shape_matrix[3][r] = (index_three[r] == 1 ? Tetris.ACTIVE_SPACE : Tetris.EMPTY_SPACE);
 		}
 		
 		return shape_matrix;

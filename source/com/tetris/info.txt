@@ -1,4 +1,4 @@
 TODO
-	-Unable to move some shapes inside they shapematrix
+	-Unable to ignore non_active_space when learing shape_matrix, great nice job
 
 

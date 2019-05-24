@@ -31,10 +31,11 @@ public class TetrisShape extends BaseShape
 	
 	private void CreateShape()
 	{
-		shapeIndex = TetrisHelper.GetRandomShapeNumber();
-		shapeMatrix = TetrisHelper.GetShape(shapeIndex);
-		shapeRotation = 0;
-		rotationLeght = TetrisHelper.GetRotationLenght(shapeIndex);
+		/*
+		 * shapeIndex = TetrisHelper.GetRandomShapeNumber(); shapeMatrix =
+		 * TetrisHelper.GetShape(shapeIndex); shapeRotation = 0; rotationLeght =
+		 * TetrisHelper.GetRotationLenght(shapeIndex);
+		 */
 	}
 	
 	public void Update(float delta)
@@ -55,12 +56,14 @@ public class TetrisShape extends BaseShape
 	 */
 	public void UpdateRotation()
 	{
-		shapeRotation++;
-		
-		if(shapeRotation >= rotationLeght)
-			shapeRotation = 0;
-		
-		shapeMatrix = TetrisHelper.GetShapeWithRotation(shapeIndex, shapeRotation);
+		/*
+		 * shapeRotation++;
+		 * 
+		 * if(shapeRotation >= rotationLeght) shapeRotation = 0;
+		 * 
+		 * shapeMatrix = TetrisHelper.GetShapeWithRotation(shapeIndex,
+		 * shapeRotation);
+		 */
 	}
 
 	/**
