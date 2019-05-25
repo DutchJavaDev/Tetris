@@ -1,4 +1,8 @@
 TODO
-	-Unable to ignore non_active_space when learing shape_matrix, great nice job
+	-Add point system
+	-UI for game over and start game
+		-use key controls?
+		
+	-Add comments to the code :\
 
 

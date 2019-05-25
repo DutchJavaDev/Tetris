@@ -21,9 +21,18 @@ public class Tetris extends GameApplication
 	public static final int GAME_WIDTH = 420;
 	public static final int GAME_HEIGHT = 640;
 	
-	public static final byte EMPTY_SPACE = 0; // empty space
-	public static final byte ACTIVE_SPACE = 1; // shape thats moves
-	public static final byte NONE_ACTIVE_SPACE = 2; // shape that has been placed in game
+	/**
+	 * Empty space (black)
+	 */
+	public static final byte EMPTY_SPACE = 0;
+	/**
+	 * Space is part of a shape that moves
+	 */
+	public static final byte ACTIVE_SPACE = 1;
+	/**
+	 * Space of a shape that has been placed in game (does not move anymore)
+	 */
+	public static final byte NONE_ACTIVE_SPACE = 2;
 
 	private final byte[][] GAME_MATRIX;
 
@@ -36,7 +45,7 @@ public class Tetris extends GameApplication
 	private int shapeX = 4;
 	private int shapeY = 0;
 	private float counter = 0f;
-	private final float updateTime = 25f;
+	private final float updateTime = 45f;
 
 	Tetris()
 	{
@@ -58,30 +67,50 @@ public class Tetris extends GameApplication
 
 		SetShape();
 	}
-
+	
+	/**
+	 * Clears the screen before moving/updating the current moving shape
+	 */
 	private void Clear()
 	{
 		for (int r = shapeY; r < shapeY + 4; r++)
 		{
-			for (int cell = shapeX; cell < shapeX + 4; cell++)
+			for (int c = shapeX; c < shapeX + 4; c++)
 			{
-				if(GAME_MATRIX[r][cell] == NONE_ACTIVE_SPACE)
-				{
-					// Weird bug with replacing active_space with non_active_space
-					System.out.println("Fking helll");
-				}
+				if(GAME_MATRIX[r][c] != NONE_ACTIVE_SPACE)
+					GAME_MATRIX[r][c] = EMPTY_SPACE;
 			}
 		}
 	}
 
+	
+	/***
+	 * Moves the shape in de 2d array, by copying the shapematrix in to the gamematrix
+	 */
 	private void SetShape()
 	{
 		Clear();
-
-		System.arraycopy(shapeMatrix[0], 0, GAME_MATRIX[shapeY], shapeX, TetrisHelper.SHAPE_MATRIX_WIDTH);
-		System.arraycopy(shapeMatrix[1], 0, GAME_MATRIX[shapeY + 1], shapeX, TetrisHelper.SHAPE_MATRIX_WIDTH);
-		System.arraycopy(shapeMatrix[2], 0, GAME_MATRIX[shapeY + 2], shapeX, TetrisHelper.SHAPE_MATRIX_WIDTH);
-		System.arraycopy(shapeMatrix[3], 0, GAME_MATRIX[shapeY + 3], shapeX, TetrisHelper.SHAPE_MATRIX_WIDTH);
+		
+		int rowCounter = 0;
+		int collumnCounter = 0;
+		
+		for (int r = shapeY; r < shapeY + shapeMatrix.length; r++)
+		{
+			for (int c = shapeX; c < shapeX + shapeMatrix[rowCounter].length; c++)
+			{
+				if(shapeMatrix[rowCounter][collumnCounter] == EMPTY_SPACE)
+				{
+					if(GAME_MATRIX[r][c] != NONE_ACTIVE_SPACE)
+						GAME_MATRIX[r][c] = shapeMatrix[rowCounter][collumnCounter];
+				}
+				else
+					GAME_MATRIX[r][c] = shapeMatrix[rowCounter][collumnCounter];
+				
+				collumnCounter++;
+			}
+			rowCounter++;
+			collumnCounter = 0;
+		}
 	}
 
 	@Override
@@ -261,18 +290,32 @@ public class Tetris extends GameApplication
 	{
 		int collisionFound = 0;
 		
-		byte[] shape_bottom = GAME_MATRIX[shapeY + 3];
-		byte[] bottom_check = GAME_MATRIX[shapeY + 4];
+		byte[] shape_bottom_zero = GAME_MATRIX[shapeY + 1];
+		byte[] shape_bottom_first = GAME_MATRIX[shapeY + 2];
+		byte[] shape_bottom_second = GAME_MATRIX[shapeY + 3];
+		
+		byte[] bottom_check_zero = GAME_MATRIX[shapeY + 2];
+		byte[] bottom_check_first = GAME_MATRIX[shapeY + 3];
+		byte[] bottom_check_second = GAME_MATRIX[shapeY + 4];
 		
 		for(int i = shapeX; i < shapeX+4; i++)
 		{
-			if(shape_bottom[i] == ACTIVE_SPACE && bottom_check[i] == NONE_ACTIVE_SPACE)
+			if(shape_bottom_zero[i] == ACTIVE_SPACE && bottom_check_zero[i] == NONE_ACTIVE_SPACE)
+				collisionFound++;
+			
+			if(shape_bottom_first[i] == ACTIVE_SPACE && bottom_check_first[i] == NONE_ACTIVE_SPACE)
+				collisionFound++;
+			
+			if(shape_bottom_second[i] == ACTIVE_SPACE && bottom_check_second[i] == NONE_ACTIVE_SPACE)
 				collisionFound++;
 		}
 		
 		return collisionFound > 0;
 	}
 	
+	/**
+	 * Sets the shape to non active
+	 */
 	void PlaceShape()
 	{
 		for(int r = shapeY; r < shapeY + 4; r++)
@@ -285,6 +328,33 @@ public class Tetris extends GameApplication
 				}
 			}
 		}
+		
+		CheckLines();
+	}
+	
+	void CheckLines()
+	{
+		int lineCount = 0;
+		
+		for(int r = GAME_MATRIX.length-1; r > 0; r--)
+		{
+			for(int c = 0; c < GAME_MATRIX[r].length; c++)
+			{
+				if(GAME_MATRIX[r][c] == NONE_ACTIVE_SPACE)
+					lineCount++;
+			}
+			
+			// Clear the line
+			if(lineCount == GAME_MATRIX[0].length)
+			{
+				for(int c = 0; c < GAME_MATRIX[r].length; c++)
+				{
+					GAME_MATRIX[r][c] = EMPTY_SPACE;
+				}
+			}
+			
+			lineCount = 0;
+		} 
 	}
 	
 	@Override
@@ -306,16 +376,6 @@ public class Tetris extends GameApplication
 				else if(GAME_MATRIX[r][c] == NONE_ACTIVE_SPACE)
 				{
 					batch.setColor(Color.blue);
-					batch.DrawString("*", x, y, "tetris_shape_font");
-				}
-				else if(GAME_MATRIX[r][c] == EMPTY_SPACE)
-				{
-					batch.setColor(Color.pink);
-					batch.DrawString("*", x, y, "tetris_shape_font");
-				}
-				else
-				{
-					batch.setColor(Color.red);
 					batch.DrawString("*", x, y, "tetris_shape_font");
 				}
 				x += 32;
