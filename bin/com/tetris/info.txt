@@ -1,4 +1,4 @@
-TODO
+TODO or NaN
 	-Add point system
 	-UI for game over and start game
 		-use key controls?

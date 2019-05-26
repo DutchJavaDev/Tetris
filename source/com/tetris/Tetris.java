@@ -55,6 +55,9 @@ public class Tetris extends GameApplication
 		CreateShape();
 	}
 
+	/**
+	 * Creates a new shape, and resets shape values
+	 */
 	private void CreateShape()
 	{
 		shapeIndex = TetrisHelper.GetRandomShapeNumber();
@@ -231,7 +234,12 @@ public class Tetris extends GameApplication
 		}
 	}
 	
-	
+	/***
+	 * Because the shapematrix is 4*4 and some shapes only take 3 or less spaces this function is need to shift the spaces inside the shapematrix
+	 * @param direction direction to move the shape inside the shapematrix
+	 * @param shape byte array of the shape
+	 * @return the shifted shape if it can be shifted else returns the same shape with no change
+	 */
 	byte[][] TryShiftPositionTo(int direction, byte[][] shape)
 	{
 		final boolean leftBlock = (shape[0][0] == ACTIVE_SPACE || 
@@ -254,6 +262,7 @@ public class Tetris extends GameApplication
 		if(direction == 1 && rightBlock)
 			return shape;
 		
+		// this shifts all the items in the array to the left or right dipending on the direction
 		final byte[][] n_shape = new byte[shape.length][shape[0].length];
 		
 		for(int r = 0; r < n_shape.length; r++)
@@ -281,11 +290,19 @@ public class Tetris extends GameApplication
 		return n_shape;
 	}
 	
+	/**
+	 * Checks if the current shape is at the bottom of the array
+	 * @return true if the shape is at the bottom of the array else false
+	 */
 	boolean IsAtBottom()
 	{
 		return shapeY + 4 == GAME_MATRIX.length;
 	}
 	
+	/***
+	 * Checks if the current shape is going to collide with another shape
+	 * @return true if if there is more than zero collision else false
+	 */
 	boolean HasCollision()
 	{
 		int collisionFound = 0;
@@ -298,6 +315,7 @@ public class Tetris extends GameApplication
 		byte[] bottom_check_first = GAME_MATRIX[shapeY + 3];
 		byte[] bottom_check_second = GAME_MATRIX[shapeY + 4];
 		
+		// Counts the amount of collisions
 		for(int i = shapeX; i < shapeX+4; i++)
 		{
 			if(shape_bottom_zero[i] == ACTIVE_SPACE && bottom_check_zero[i] == NONE_ACTIVE_SPACE)
@@ -332,6 +350,9 @@ public class Tetris extends GameApplication
 		CheckLines();
 	}
 	
+	/**
+	 * Checks if a line is full of NONE_ACTIVE_SPACE if so then it gets removed
+	 */
 	void CheckLines()
 	{
 		int lineCount = 0;

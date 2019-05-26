@@ -13,9 +13,15 @@ public class TetrisHelper
 {
 	public static final int SHAPE_MATRIX_WIDTH = 4;
 	public static final int SHAPE_MATRIX_HEIGHT = 4;
+	
+	/**
+	 * 3d array of all the tetris shapes with rotations
+	 */
 	private static final byte[][][] SHAPES = new byte[7][4][SHAPE_MATRIX_WIDTH*SHAPE_MATRIX_HEIGHT];
 	
-	
+	/**
+	 * Creates the shapes with their rotations
+	 */
 	public static void Init()
 	{
 		//#SHAPE 0
@@ -138,14 +144,18 @@ public class TetrisHelper
 		//#SHAPE 6
 	}
 	
+	/***
+	 * Returns a random number within the range of {@link #SHAPES}
+	 * @return
+	 */
 	public static int GetRandomShapeNumber()
 	{
 		return ThreadLocalRandom.current().nextInt(0, SHAPES.length);
 	}
 
 	/**
-	 * Gets a shape
-	 * @param index
+	 * Gets a shape from {@link #SHAPES}
+	 * @param index of the shape
 	 * @return
 	 */
 	public static byte[][] GetShape(int index)
@@ -154,9 +164,9 @@ public class TetrisHelper
 	}
 	
 	/**
-	 * Returns a rotated shape
-	 * @param index
-	 * @param rotation
+	 * Returns a rotated shape from {@link #SHAPES}
+	 * @param index wich shape
+	 * @param rotation wich rotation of the shape
 	 * @return
 	 */
 	public static byte[][] GetShapeWithRotation(int index,int rotation)
@@ -166,7 +176,7 @@ public class TetrisHelper
 	
 	/**
 	 * Checks how many rotations a shape has
-	 * @param shapeIndex
+	 * @param shapeIndex index of the shape
 	 * @return
 	 */
 	public static int GetRotationLenght(int shapeIndex)
@@ -191,7 +201,11 @@ public class TetrisHelper
 		return lenght;
 	}
 	
-	
+	/**
+	 * Flips a shape horizontaly
+	 * @param shape shape to be flipped
+	 * @return shape that has been flipped horizontaly
+	 */
 	private static byte[] HorizontalFlip(byte[] shape)
 	{
 		final byte[] index_zero = new byte[SHAPE_MATRIX_WIDTH];
